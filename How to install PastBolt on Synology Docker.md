@@ -8,3 +8,5 @@
 
 #Install PastBolt
 
+# synology
+Synology NAS related materials
