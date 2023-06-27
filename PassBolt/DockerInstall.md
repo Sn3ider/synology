@@ -77,3 +77,10 @@ Register Admin:
 ```bash
 su -s /bin/bash -c "/usr/share/php/passbolt/bin/cake passbolt register_user -u YOUREMAIL -f YOURFIRSTNAME -l YOURLASTNAME -r admin" www-data
 ```
+# Error management
+[FAIL] Hostname does not match when validating certificates. 
+[FAIL] The server OpenPGP key is not set 
+[FAIL] The server key fingerprint doesn't match the one defined in /etc/passbolt/passbolt.php.
+[FAIL] The server public key defined in the /etc/passbolt/passbolt.php (or environment variables) is not in the keyring
+[FAIL] The server key does not have a valid email id.
+
