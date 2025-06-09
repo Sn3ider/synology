@@ -1,0 +1,66 @@
+services:
+  # db:
+  #   image: mariadb:11.4-noble #LTS Long Time Support Until May 29, 2029.
+  #   container_name: Passbolt-DB
+  #   hostname: passbolt-db
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - /volume1/docker/passbolt/db:/var/lib/mysql:rw
+  #   environment:
+  #     TZ: Europe/London
+  #     MYSQL_ROOT_PASSWORD: rootpass
+  #     MYSQL_DATABASE: passbolt
+  #     MYSQL_USER: passboltuser
+  #     MYSQL_PASSWORD: PqbVLF9QeeMaHT23xsjk3e5m1OAc6z@a
+  #   restart: on-failure:5
+
+  passbolt:
+    image: passbolt/passbolt:latest-ce-non-root
+    command:
+      - /bin/bash
+      - -c
+      - /usr/bin/wait-for.sh -t 0 172.27.0.1:3307 -- /docker-entrypoint.sh
+    container_name: Passbolt
+    hostname: passbolt
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: curl -f http://localhost:8080/ || exit 1
+    ports:
+      - 9475:8080
+    volumes:
+      - ./gpg:/etc/passbolt/gpg:rw
+      - ./jwt:/etc/passbolt/jwt:rw
+    environment:
+      DEBUG: false
+      APP_FULL_BASE_URL: <Create your own Reverse Proxy>
+      DATASOURCES_DEFAULT_HOST: 172.27.0.1:3307
+      DATASOURCES_DEFAULT_USERNAME: passboltuser
+      DATASOURCES_DEFAULT_PASSWORD: <Create your own DB Password>
+      DATASOURCES_DEFAULT_DATABASE: passbolt
+      PASSBOLT_REGISTRATION_PUBLIC: true
+      EMAIL_DEFAULT_FROM: <Add your owm Gmail account>
+      EMAIL_TRANSPORT_DEFAULT_HOST: smtp.gmail.com
+      EMAIL_TRANSPORT_DEFAULT_PORT: 587
+      EMAIL_TRANSPORT_DEFAULT_USERNAME: <Add your owm Gmail account>
+      EMAIL_TRANSPORT_DEFAULT_PASSWORD: <Add your own Gmail account password>
+      EMAIL_TRANSPORT_DEFAULT_TLS: true
+    restart: on-failure:5
+    # depends_on:
+    #   db:
+    #     condition: service_started
+    networks:
+      passbolt:
+          ipv4_address: 172.27.0.3
+
+networks:
+  passbolt:
+    name: passbolt
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.27.0.0/16
+          ip_range: 172.27.0.0/16
+          gateway: 172.27.0.1  
