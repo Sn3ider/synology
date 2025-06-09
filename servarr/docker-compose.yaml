@@ -1,0 +1,239 @@
+services:
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1027
+      - PGID=100
+      - TZ=Europe/London
+    volumes:
+      - ./prowlarr:/config
+      - /volume1/downloads/downloads:/downloads
+      - /volume1/downloads:/volume1/downloads
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+    networks:
+      servarr:
+          ipv4_address: 172.20.0.2
+
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=1027
+      - PGID=100
+      - TZ=Europe/London
+      - AUTO_UPDATE=true #optional
+      - RUN_OPTS= #optional
+    volumes:
+      - ./jackett:/config
+      - /volume1/downloads/downloads:/downloads
+      - /volume1/downloads:/volume1/downloads
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+    networks:
+      servarr:
+          ipv4_address: 172.20.0.3
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1027
+      - PGID=100
+      - TZ=Europe/London
+    volumes:
+      - ./radarr:/config
+      - /volume1/downloads/video/Movies:/movies #optional
+      - /volume1/downloads/video/Temp:/downloads #optional
+      - /volume1/downloads:/volume1/downloads
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+    networks:
+      servarr:
+          ipv4_address: 172.20.0.4
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1027
+      - PGID=100
+      - TZ=Europe/London
+    volumes:
+      - ./sonarr:/config
+      - /volume1/downloads/video/TV Shows:/tv #optional
+      - /volume1/downloads/video/Temp:/downloads #optional
+      - /volume1/downloads:/volume1/downloads
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+    networks:
+      servarr:
+          ipv4_address: 172.20.0.5
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=1027
+      - PGID=100
+      - TZ=Europe/London
+    volumes:
+      - ./bazarr:/config
+      - /volume1/downloads/video/Movies:/movies #optional
+      - /volume1/downloads/video/TV Shows:/tv #optional
+      - /volume1/downloads:/volume1/downloads
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+    networks:
+      servarr:
+          ipv4_address: 172.20.0.6
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=1027
+      - PGID=100
+      - TZ=Europe/London
+    volumes:
+      - ./lidarr:/config
+      - /volume1/downloads/music/All Music:/music #optional
+      - /volume1/downloads/music/Temp:/downloads #optional
+      - /volume1/downloads:/volume1/downloads
+    ports:
+      - 8686:8686
+    restart: unless-stopped
+    networks:
+      servarr:
+          ipv4_address: 172.20.0.7
+
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: readarr
+    environment:
+      - PUID=1027
+      - PGID=100
+      - TZ=Europe/London
+    volumes:
+      - ./readarr:/config
+      - /volume1/downloads/ebook/ebook:/books #optional
+      - /volume1/downloads/ebook/Temp:/downloads #optional
+      - /volume1/downloads:/volume1/downloads
+    ports:
+      - 8787:8787
+    restart: unless-stopped
+    networks:
+      servarr:
+          ipv4_address: 172.20.0.8
+
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: overseerr
+    environment:
+      - PUID=1027
+      - PGID=100
+      - TZ=Etc/UTC
+    volumes:
+      - ./overseerr:/config
+      - /volume1/downloads:/volume1/downloads
+    ports:
+      - 5055:5055
+    restart: unless-stopped
+    networks:
+      servarr:
+          ipv4_address: 172.20.0.9
+
+  maintainerr:
+      image: ghcr.io/jorenn92/maintainerr:latest # or jorenn92/maintainerr:latest
+      container_name: maintainerr
+      user: 1027:100
+      volumes:
+        - ./maintainerr/opt/data:/opt/data
+        - ./maintainerr/opt/app/ui/.next/cache:/opt/app/ui/.next/cache
+      environment:
+        - TZ=Europe/London
+        # - BASE_PATH=/maintainerr # uncomment if you're serving maintainerr from a subdirectory
+        # - UI_HOSTNAME=:: # uncomment if you want to listen on IPv6 instead (default 0.0.0.0)
+        # - UI_PORT=6247 # uncomment to change the UI port (default 6246). Useful if you're on a network where the port is already in use
+        # - API_PORT=3002 # uncomment to change the API port (default 3001). Useful if you're on a network where the port is already in use
+      ports:
+        - 6246:6246
+      restart: unless-stopped
+      networks:
+        servarr:
+            ipv4_address: 172.20.0.10
+
+  tautulli:
+    image: lscr.io/linuxserver/tautulli:latest
+    container_name: tautulli
+    environment:
+      - PUID=1027
+      - PGID=100
+      - TZ=Etc/London
+    volumes:
+      - ./tautulli/config:/config
+    ports:
+      - 8181:8181
+    restart: unless-stopped
+    networks:
+      servarr:
+          ipv4_address: 172.20.0.11
+
+  mdblistarr:
+    container_name: mdblistarr
+    image: linaspurinis/mdblistarr:latest
+    environment:
+      - PORT=5353
+    volumes:
+      - ./mdblistarr/db:/usr/src/db/
+    ports:
+      - 5353:5353
+    networks:
+      servarr:
+          ipv4_address: 172.20.0.12
+
+  huntarr:
+    container_name: huntarr
+    image: huntarr/huntarr:latest
+    restart: unless-stopped
+    environment:
+      - TZ=Etc/London
+    ports:
+      - 9705:9705  
+    volumes:
+      - ./huntarr:/config 
+    networks:
+      servarr:
+          ipv4_address: 172.20.0.13
+
+  # suggestarr:
+  #   image: ciuse99/suggestarr:latest
+  #   container_name: SuggestArr
+  #   restart: unless-stopped
+  #   ports:
+  #     - 5007:5000
+  #   volumes:
+  #     - ./suggestarr/config:/app/config/config_files
+  #   environment:
+  #     # Optional: Only needed if something goes wrong and you need to inspect deeper
+  #     - LOG_LEVEL=${LOG_LEVEL:-info}
+  #   networks:
+  #     servarr:
+  #         ipv4_address: 172.20.0.14
+
+networks:
+  servarr:
+    name: servarr
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+          ip_range: 172.20.0.0/16
+          gateway: 172.20.0.1
